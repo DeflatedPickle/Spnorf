@@ -30,13 +30,22 @@ class DockPanel(val orientation: Orientation, val paddingInsets: Insets) : JPane
         isOpaque = false
 
         this.dropTarget = object : DropTarget() {
+            override fun dragOver(dtde: DropTargetDragEvent) {
+                super.dragOver(dtde)
+
+                // TODO: Add a temporary button, in the column closest to the mouse
+            }
+
             override fun drop(dtde: DropTargetDropEvent) {
                 // super.drop(dtde)
+                // TODO: Add DnD for dock buttons, so they can be re-organised
 
+                // TODO: Reject (or resolve) if it's a shortcut or not an executable
                 dtde.acceptDrop(DnDConstants.ACTION_COPY)
                 val droppedFiles = dtde.transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
 
                 for (file in droppedFiles) {
+                    // TODO: Check if the file is a shortcut then reject it or resolve the linked file
                     barIconFiles.add(file)
                     addButton(file)
                 }
@@ -60,7 +69,12 @@ class DockPanel(val orientation: Orientation, val paddingInsets: Insets) : JPane
                 val frameSize = GlobalValues.frame!!.size
 
                 // If the mouse is outside the range border
-                val rectangle = Rectangle(frameLocation.x - distanceLimit.x, frameLocation.y - distanceLimit.y, frameSize.width + (distanceLimit.width * 2), frameSize.height + (distanceLimit.height * 2))
+                val rectangle = Rectangle(
+                    frameLocation.x - distanceLimit.x,
+                    frameLocation.y - distanceLimit.y,
+                    frameSize.width + (distanceLimit.width * 2),
+                    frameSize.height + (distanceLimit.height * 2)
+                )
                 if (!rectangle.contains(mouseLocation)) {
                     i.weight = 100 / this.barIconButtons.size
                     continue
@@ -72,7 +86,10 @@ class DockPanel(val orientation: Orientation, val paddingInsets: Insets) : JPane
                 val buttonLocation = i.location
                 val buttonSize = i.size
                 // Get the distance from the pointer to this button
-                val distance = Point(relativeMouseLocation.x - buttonLocation.x - (buttonSize.width / 2), relativeMouseLocation.y - buttonLocation.y - (buttonSize.height / 2))
+                val distance = Point(
+                    relativeMouseLocation.x - buttonLocation.x - (buttonSize.width / 2),
+                    relativeMouseLocation.y - buttonLocation.y - (buttonSize.height / 2)
+                )
                 i.update(distance)
 
                 totalWeights += i.weight
@@ -86,7 +103,22 @@ class DockPanel(val orientation: Orientation, val paddingInsets: Insets) : JPane
                 // println("${i.text}, $percentage")
 
                 // Update the constraints based on weight
-                this.gridBagLayout.setConstraints(i, GridBagConstraints(i.column, i.row, 1, 1, percentage, percentage, GridBagConstraints.WEST, GridBagConstraints.BOTH, paddingInsets, 1, 1))
+                this.gridBagLayout.setConstraints(
+                    i,
+                    GridBagConstraints(
+                        i.column,
+                        i.row,
+                        1,
+                        1,
+                        percentage,
+                        percentage,
+                        GridBagConstraints.WEST,
+                        GridBagConstraints.BOTH,
+                        paddingInsets,
+                        1,
+                        1
+                    )
+                )
                 this.revalidate()
             }
         })
@@ -114,8 +146,27 @@ class DockPanel(val orientation: Orientation, val paddingInsets: Insets) : JPane
             DockButton(file.name.substringAfterLast("\\").substringBefore(".").capitalize()).also {
                 it.row = row
                 it.column = column
-                this.gridBagLayout.setConstraints(it, GridBagConstraints(column, row, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, paddingInsets, 1, 1))
+                this.gridBagLayout.setConstraints(
+                    it,
+                    GridBagConstraints(
+                        column,
+                        row,
+                        1,
+                        1,
+                        1.0,
+                        1.0,
+                        GridBagConstraints.WEST,
+                        GridBagConstraints.BOTH,
+                        paddingInsets,
+                        1,
+                        1
+                    )
+                )
                 this.add(it)
+            }.apply {
+                addActionListener {
+                    Runtime.getRuntime().exec(file.absolutePath)
+                }
             }
         )
         when (this.orientation) {
