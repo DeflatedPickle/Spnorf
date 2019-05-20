@@ -1,11 +1,10 @@
 package com.deflatedpickle.spnorf
 
-import java.awt.Color
-import java.awt.Insets
-import java.awt.Window
+import java.awt.*
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
+import java.awt.Toolkit.getDefaultToolkit
 
 
 @Suppress("KDocMissingDocumentation")
@@ -22,17 +21,26 @@ fun main() {
     frame.type = Window.Type.UTILITY
 
     val paddingInsets = Insets(4, 4, 4, 4)
-    val orientation = Orientation.HORIZONTAL
-    val panel = DockPanel(orientation, paddingInsets)
+    val panel = DockPanel(paddingInsets)
     frame.add(panel)
 
     frame.pack()
     frame.isVisible = true
 
-    when (orientation) {
+    when (GlobalValues.orientation) {
         Orientation.HORIZONTAL -> frame.setSize(600, 100)
         Orientation.VERTICAL -> frame.setSize(100, 600)
     }
 
-    frame.setLocationRelativeTo(null)
+    val edgePadding = 8
+
+    val screenSize = GlobalValues.getEffectiveScreenSize(panel)
+    when (GlobalValues.side) {
+        Side.LEFT -> frame.setLocation(edgePadding, (screenSize.height / 2))
+        Side.RIGHT -> frame.setLocation(screenSize.width - edgePadding, (screenSize.height / 2))
+        Side.TOP -> frame.setLocation((screenSize.width / 2), edgePadding)
+        Side.BOTTOM -> frame.setLocation((screenSize.width / 2), screenSize.height - edgePadding)
+    }
+
+    // frame.setLocationRelativeTo(null)
 }

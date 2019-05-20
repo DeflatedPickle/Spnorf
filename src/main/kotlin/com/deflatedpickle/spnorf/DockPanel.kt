@@ -12,7 +12,7 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.Timer
 
-class DockPanel(val orientation: Orientation, val paddingInsets: Insets) : JPanel() {
+class DockPanel(val paddingInsets: Insets) : JPanel() {
     val gridBagLayout = GridBagLayout()
 
     // Config Options
@@ -133,9 +133,21 @@ class DockPanel(val orientation: Orientation, val paddingInsets: Insets) : JPane
         // TODO: Add an embedded scripting language, so this can be completely customizable
         g.color = Color.WHITE
 
-        when (this.orientation) {
-            Orientation.HORIZONTAL -> g.fillRect(0, this.height - barHeight, this.width, this.height)
-            Orientation.VERTICAL -> g.fillRect(0, 0, barWidth, this.height)
+        when (GlobalValues.orientation) {
+            Orientation.HORIZONTAL -> {
+                when(GlobalValues.side) {
+                    Side.TOP -> g.fillRect(0, 0, this.width, barHeight)
+                    Side.BOTTOM -> g.fillRect(0, this.height - barHeight, this.width, this.height)
+                    else -> {}
+                }
+            }
+            Orientation.VERTICAL -> {
+                when(GlobalValues.side) {
+                    Side.LEFT -> g.fillRect(0, 0, barWidth, this.height)
+                    Side.RIGHT -> g.fillRect(this.width - barWidth, 0, barWidth, this.height)
+                    else -> {}
+                }
+            }
         }
     }
 
@@ -169,7 +181,7 @@ class DockPanel(val orientation: Orientation, val paddingInsets: Insets) : JPane
                 }
             }
         )
-        when (this.orientation) {
+        when (GlobalValues.orientation) {
             Orientation.HORIZONTAL -> column++
             Orientation.VERTICAL -> row++
         }

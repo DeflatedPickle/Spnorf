@@ -24,7 +24,11 @@ class DockButton(text: String) : JButton(text) {
         // println(mouseDistance)
 
         // Calculate the weight based on mouse distance
-        weight = (mouseDistance.x * mouseDistance.x) / 140
+        // TODO: Stop using magic numbers, figure out what to divide by
+        weight = when (GlobalValues.orientation) {
+            Orientation.HORIZONTAL -> (mouseDistance.x * mouseDistance.x) / 140
+            Orientation.VERTICAL -> (mouseDistance.y * mouseDistance.y) / 300
+        }
         // println("$text, $weight")
     }
 }
